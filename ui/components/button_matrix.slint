@@ -1,0 +1,41 @@
+import { Palette } from "../globals/palette.slint";
+import { HorizontalBox } from "std-widgets.slint";
+import { MatrixState } from "../globals/matrix_state.slint";
+component Button inherits Rectangle {
+    in-out property <bool> active: false;
+    private property <length> size: 16px;
+    private property <bool> is-hovering: false;
+    callback on-click();
+
+    background: touch.has-hover ? Palette.card-background.darker(0.2) : active ? Palette.primary : Palette.card-background;
+    border-width: 1px;
+    border-color: Palette.primary;
+    width: size;
+    height: size;
+
+    touch := TouchArea {
+        clicked => {
+            on-click();
+        }
+    }
+}
+
+export component ButtonMatrix {
+
+    VerticalLayout {
+        padding: 0px;
+        spacing: 0px;
+
+        for button-row[i] in MatrixState.matrix: HorizontalBox {
+            padding: 0px;
+            spacing: 0px;
+
+            for button[j] in button-row: Button {
+                active: button;
+                on-click => {
+                    MatrixState.set-matrix-item(i, j, !button);
+                }
+            }
+        }
+    }
+}

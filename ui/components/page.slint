@@ -1,0 +1,16 @@
+import { VerticalBox } from "std-widgets.slint";
+export component Page inherits VerticalBox {
+    in property <string> title;
+
+    alignment: start;
+    padding: 16px;
+    height: 100%;
+
+    Text {
+        text: title;
+        font-size: 24px;
+        font-weight: 600;
+    }
+
+    @children
+}

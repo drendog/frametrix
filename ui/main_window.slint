@@ -1,0 +1,171 @@
+import { Palette, ScrollView, StandardListView, ListView, TabWidget, Button, VerticalBox, HorizontalBox } from "std-widgets.slint";
+import { Palette } from "./globals/palette.slint";
+import { SideBar } from "components/sidebar.slint";
+import { PatternPage } from "pages/pattern_page.slint";
+import { SettingsPage } from "pages/pages.slint";
+import { MatrixControlPage } from "pages/matrix_control_page.slint";
+
+export { MatrixState } from "./globals/matrix_state.slint";
+
+struct DeviceInfo {
+    name: string,
+    status: string,
+}
+
+struct SlintPattern {
+    label: string,
+    id: int,
+}
+
+component DeviceCard inherits Rectangle {
+    in property <DeviceInfo> device;
+
+    height: 60px;
+    background: Palette.card-background;
+    border-radius: 8px;
+    drop-shadow-color: #0000001a;
+    drop-shadow-offset-x: 0px;
+    drop-shadow-offset-y: 2px;
+    drop-shadow-blur: 4px;
+
+    HorizontalLayout {
+        padding: 16px;
+        spacing: 16px;
+        alignment: space-between;
+
+        Text {
+            text: device.name;
+            font-size: 16px;
+            color: Palette.text-primary;
+            vertical-alignment: center;
+        }
+
+        Rectangle {
+            width: 100px;
+            background: device.status == "Connected" ? Palette.success : Palette.warning;
+            border-radius: 16px;
+            opacity: 1;
+
+            Text {
+                text: device.status;
+                font-size: 14px;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+                color: Palette.text-primary;
+            }
+        }
+    }
+}
+
+export component MainWindow inherits Window {
+    in property <[DeviceInfo]> devices: [];
+    in property <[SlintPattern]> patterns: [];
+    in property <[StandardListViewItem]> standard-patterns: [];
+    out property <int> selected-id: -1;
+    in-out property <int> current-page: 0;
+    callback refresh-devices();
+    callback send-pattern(int);
+    callback send-brightness(int);
+
+    title: "Frametrix";
+    background: Palette.background;
+    preferred-width: 600px;
+    preferred-height: 500px;
+    padding: 0px;
+    VerticalBox {
+        width: 100%;
+        padding: 0px;
+        HorizontalBox {
+            height: 100%;
+            padding: 0px;
+            VerticalBox {
+                max-width: 300px;
+                padding: 0px;
+                Rectangle {
+                    height: 100%;
+                    background: Palette.background;
+                    drop-shadow-blur: 16px;
+                    drop-shadow-color: #0000001a;
+                    drop-shadow-offset-x: 8px;
+                    drop-shadow-offset-y: 0px;
+                    padding: 0px;
+
+                    VerticalBox {
+                        padding: 0px;
+                        VerticalBox {
+                            padding: 16px;
+                            spacing: 8px;
+                            HorizontalBox {
+                                alignment: space-between;
+                                Text {
+                                    text: "Devices";
+                                    font-size: 24px;
+                                    font-weight: 600;
+                                    color: Palette.text-primary;
+                                }
+
+                                Button {
+                                    height: 40px;
+                                    text: "Refresh";
+                                    clicked => {
+                                        refresh-devices()
+                                    }
+                                }
+                            }
+
+                            if devices.length == 0: Rectangle {
+                                height: 60px;
+                                background: Palette.warning.with-alpha(0.1);
+                                border-radius: 8px;
+
+                                Text {
+                                    text: "No devices found";
+                                    color: Palette.warning;
+                                    font-size: 14px;
+                                    horizontal-alignment: center;
+                                    vertical-alignment: center;
+                                }
+                            }
+
+                            for device in devices: DeviceCard {
+                                device: device;
+                            }
+                        }
+
+                        sidebar := SideBar {
+                            padding: 0px;
+                            model: [
+                                "Patterns",
+                                "Matrix Control",
+                                "Settings",
+                            ];
+                            item-selected(value) => {
+                                current-page = self.current-item;
+                            }
+                        }
+                    }
+                }
+            }
+
+            VerticalBox {
+                min-width: 300px;
+                alignment: start;
+
+                if (current-page == 0): PatternPage {
+                    standard-patterns: standard-patterns;
+                    send-pattern(idx) => {
+                        send-pattern(idx);
+                    }
+                }
+
+                if (current-page == 1): MatrixControlPage { }
+
+                if (current-page == 2): SettingsPage {
+                    send-brightness(value) => {
+                        send-brightness(value);
+                    }
+                }
+            }
+        }
+    }
+}

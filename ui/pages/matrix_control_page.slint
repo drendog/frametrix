@@ -1,0 +1,10 @@
+import { ButtonMatrix } from "../components/button_matrix.slint";
+import { Page } from "../components/page.slint";
+
+export component MatrixControlPage inherits Page {
+    callback button-clicked([[bool]]);
+
+    title: "Matrix Control";
+
+    ButtonMatrix { }
+}

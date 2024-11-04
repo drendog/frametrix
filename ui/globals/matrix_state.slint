@@ -1,0 +1,12 @@
+export global MatrixState {
+    in-out property <[[bool]]> matrix;
+    callback set-matrix([[bool]]);
+
+    public function set-matrix-item(x: int, y: int, value: bool) {
+        matrix[x][y] = value;
+        set-matrix(matrix);
+    }
+
+    in-out property <int> brightness;
+    callback set-brightness();
+}

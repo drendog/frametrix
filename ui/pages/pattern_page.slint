@@ -1,0 +1,17 @@
+import { StandardListView } from "std-widgets.slint";
+import { Palette } from "../globals/palette.slint";
+import { Page } from "../components/page.slint";
+
+export component PatternPage inherits Page {
+    in property <[StandardListViewItem]> standard-patterns: [];
+    callback send-pattern(int);
+    title: "Patterns";
+
+    StandardListView {
+        height: 100%;
+        current-item-changed => {
+            send-pattern(self.current-item);
+        }
+        model: standard-patterns;
+    }
+}

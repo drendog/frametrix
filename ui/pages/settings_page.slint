@@ -1,0 +1,20 @@
+import { Palette } from "../globals/palette.slint";
+import { Slider, VerticalBox } from "std-widgets.slint";
+import { Page } from "../components/page.slint";
+export component SettingsPage inherits Page {
+    callback send-brightness(int);
+    title: "Settings";
+
+    Text {
+        text: "Brightness";
+    }
+
+    Slider {
+        maximum: 255;
+        value: 100;
+
+        released => {
+            send-brightness(self.value);
+        }
+    }
+}
